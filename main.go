@@ -5,8 +5,11 @@ import (
 
 	"os"
 
+	"fmt"
 	"math/rand"
 	"time"
+
+	"flag"
 
 	"github.com/0xAX/notificator"
 	"github.com/faiface/beep/mp3"
@@ -14,15 +17,21 @@ import (
 )
 
 func main() {
+	min := flag.Int("min", 20, "minimum number of minutes for ticker")
+	max := flag.Int("max", 40, "maximum number of minutes for ticker")
+
+	flag.Parse()
+
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	r.Seed(time.Now().UnixNano())
 
 	resetTicker := func() *time.Ticker {
-		duration := r.Intn(40-20) + 20 + 1
+		duration := r.Intn(*max-*min) + *min
+		log.Println(fmt.Sprintf("ticker set for %d minutes", duration))
 		return time.NewTicker(time.Duration(duration) * time.Minute)
 	}
 
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := resetTicker()
 	for {
 		select {
 		case t := <-ticker.C:
@@ -41,11 +50,12 @@ func main() {
 			speaker.Init(sr, format.SampleRate.N(time.Second/10))
 
 			notify := notificator.New(notificator.Options{
-				DefaultIcon: "./stretch.jpg",
+				DefaultIcon: "./golang.png",
 				AppName:     "Stretch",
 			})
 
-			notify.Push("MOVEMENT!", "If you're sitting, stand.\nIf you're standing, stretch.", "", notificator.UR_CRITICAL)
+			notify.Push("MOVEMENT!", "If you're sitting, stand.\nIf you're standing, stretch!", "", notificator.UR_CRITICAL)
+
 			speaker.Play(streamer)
 			ticker.Stop()
 			ticker = resetTicker()
