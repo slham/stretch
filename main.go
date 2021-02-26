@@ -1,15 +1,12 @@
 package main
 
 import (
-	"log"
-
-	"os"
-
-	"fmt"
-	"math/rand"
-	"time"
-
 	"flag"
+	"fmt"
+	"log"
+	"math/rand"
+	"os"
+	"time"
 
 	"github.com/0xAX/notificator"
 	"github.com/faiface/beep/mp3"
